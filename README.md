@@ -8,7 +8,7 @@ Our powerful tool helps you search posts by text and filter by LinkedIn profiles
 - Low pricing: $2 per 1k posts.
 - Fast response times deliver data in seconds 🚀
 - No caching, fresh data.
-- Concurrency: each actor works scraping 3 search queries at a time.
+- Concurrency: each actor works scraping 5 search queries at a time.
 
 ## How It Works
 
@@ -114,7 +114,7 @@ Here is the example post output of this actor:
 }
 ```
 
-## Linkedin profiles API
+## Linkedin Post Search API
 
 The actor stores results in a dataset. You can export data in various formats such as CSV, JSON, XLS, etc. You can scrape and access data on demand using API.
 
