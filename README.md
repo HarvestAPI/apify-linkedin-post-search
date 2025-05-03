@@ -1,6 +1,6 @@
-## LinkedIn Profile Posts scraper
+## LinkedIn Posts Search scraper
 
-Our powerful tool helps you gather posts from LinkedIn profiles or companies without compromising security or violating platform policies.
+Our powerful tool helps you search posts by text and filter by LinkedIn profiles or companies without compromising security or violating platform policies.
 
 ### Key Benefits
 
@@ -8,19 +8,35 @@ Our powerful tool helps you gather posts from LinkedIn profiles or companies wit
 - Low pricing: $2 per 1k posts.
 - Fast response times deliver data in seconds 🚀
 - No caching, fresh data.
-- Concurrency: each actor works scraping 3 profiles/companies at a time.
+- Concurrency: each actor works scraping 3 search queries at a time.
 
 ## How It Works
 
-Simply provide one of the following:
+- (required) List of search queries (e.g., `Hiring software engineer`, Hiring full stack developer`)
+- (optionally) List of LinkedIn profile/company URLs who posted the content
+- (optionally) List of LinkedIn public identifiers who posted the content (e.g., `williamhgates` from `https://www.linkedin.com/in/williamhgates`)
+- (optionally) List if LinkedIn profile/company IDs who posted the content (e.g. ACoAAA8BYqEBCGLg_vT_ca6mMEqkpp9nVffJ3hc)
+- (optionally) List of LinkedIn companies where authors work (e.g., `Microsoft`, `Google`).
 
-- List of LinkedIn profile/company URLs
-- List of LinkedIn public identifiers (e.g., `williamhgates` from `https://www.linkedin.com/in/williamhgates`)
-- List if LinkedIn profile/company IDs (e.g. ACoAAA8BYqEBCGLg_vT_ca6mMEqkpp9nVffJ3hc)
+For example you can search posts by Google (or other company) employees who hire software engineers:
 
-Optionally:
+```json
+{
+  "searchQueries": [
+    "Hiring software engineer",
+    "Hiring full stack developer",
+    "Hiring backend developer"
+  ],
+  "authorsCompanyPublicIdentifiers": ["google", "microsoft", "amazon", "meta"]
+}
+```
 
-- `scrapePages` - Number of pages to scrape. Each page is 20 posts. Posts sorted by date.
+**This is Post Search scraper, so list of search queries is required. If you don't care about search queries, and you want to scrape all posts from specific companies or authors, our [LinkedIn Profile Posts Scraper](https://apify.com/harvestapi/linkedin-profile-posts) works better for this use-case**
+
+Other params (optionally):
+
+- `maxPosts` - Maximum number of posts to scrape per each search query. This overrides `scrapePages` pagination. If you set this to 0, it will scrape all posts.
+- `scrapePages` - Number of pages to scrape, if `maxPosts` is not set. Each page is 20 posts.
 - `page` - Page number to start scraping from. Default is 1.
 
 ### Data You'll Receive
@@ -39,32 +55,33 @@ Here is the example post output of this actor:
 
 ```json
 {
-  "id": "7319399301971943425",
-  "content": "I’m inspired by Safia Ibrahim, a polio survivor who embodies resilience and determination. Her story is a testament to overcoming life’s toughest challenges—and a reminder of why we must continue to fight for a polio-free world. #EndPolio",
+  "id": "7324184462546677761",
+  "content": "My team is #hiring a Software Development Engineer to help build the future of Amazon Marketing Tech. We have a critical mission: transforming how Amazon shows up to customers at scale. Do you know anyone who might be interested?",
   "title": null,
   "subtitle": null,
   "link": null,
   "linkLabel": null,
   "description": null,
   "authorUniversalName": null,
-  "authorPublicIdentifier": "williamhgates",
+  "authorPublicIdentifier": "gaoqunbo",
   "authorType": "profile",
-  "authorName": "Bill Gates",
-  "authorLinkedinUrl": "https://www.linkedin.com/in/williamhgates?miniProfileUrn=urn%3Ali%3Afsd_profile%3AACoAAA8BYqEBCGLg_vT_ca6mMEqkpp9nVffJ3hc",
-  "authorInfo": "Chair, Gates Foundation and Founder, Breakthrough Energy",
-  "authorWebsite": "https://www.linkedin.com/newsletters/gates-notes-6651495472181637121/",
-  "authorWebsiteLabel": "View my newsletter",
+  "authorName": "Kate Gao",
+  "authorLinkedinUrl": "https://www.linkedin.com/in/gaoqunbo?miniProfileUrn=urn%3Ali%3Afsd_profile%3AACoAABUJtmcBwqio62D594inx4a37ym9hCIW0U4",
+  "authorInfo": "Software Development Manager at Amazon",
+  "authorWebsite": null,
+  "authorWebsiteLabel": null,
   "authorAvatar": {
-    "url": "https://media.licdn.com/dms/image/v2/D5603AQF-RYZP55jmXA/profile-displayphoto-shrink_800_800/B56ZRi8g.aGsAc-/0/1736826818808?e=1750896000&v=beta&t=-ok3THccfWUuj-xmZR1y6HPFCE7Q8RLna7KxpU3bOlo",
+    "url": "https://media.licdn.com/dms/image/v2/D5635AQEI-ApPyb66cw/profile-framedphoto-shrink_800_800/B56ZaS69bvHUAk-/0/1746221652117?e=1746900000&v=beta&t=WcNOd8DzwayA3kgDVPHJymvQMqLJvNhxHH68a_H-qz0",
     "width": 800,
     "height": 800,
-    "expiresAt": 1750896000000
+    "expiresAt": 1746900000000
   },
-  "postedAgo": "5d",
+  "postedAgo": "19h",
   "postImage": null,
   "postImages": [],
   "postVideo": null,
-  "repostId": "7314358712113025024",
+  "repostId": null,
+  "repostedBy": null,
   "newsletterUrl": null,
   "newsletterTitle": null,
   "socialContent": {
@@ -77,86 +94,18 @@ Here is the example post output of this actor:
     "hideViewsCount": false,
     "hideReactAction": false,
     "hideCommentAction": false,
-    "shareUrl": "https://www.linkedin.com/posts/williamhgates_endpolio-globalhealth-activity-7319399301971943425-6S3H?utm_source=social_share_send&utm_medium=member_desktop_web&rcm=ACoAAEv_LPcBziubM3KuMdS8HJ_FpZ-4kRH3Hz8",
+    "shareUrl": "https://www.linkedin.com/posts/gaoqunbo_hiring-activity-7324184462546677761-JqZw?utm_source=combined_share_message&utm_medium=member_desktop_web&rcm=ACoAAEwIeUIB_gsyqdC2fajTw2ymxt-UYExdbTE",
     "showContributionExperience": false,
     "showSocialDetail": true
   },
-  "repost": {
-    "id": "7314358712113025024",
-    "content": "What does it take to overcome life’s toughest challenges?\n\nFor Safia Ibrahim, a polio survivor and global health advocate, it’s resilience, hope, and storytelling.\n\nShe shared her powerful story with the world from The Moth stage as part of a Gates Foundation event. Now, she joins us to reflect on her journey and the role of storytelling in global health advocacy.\n\nListen to this inspiring conversation 🎧 on.rotary.org/moth-pod\n\n#EndPolio #GlobalHealth",
-    "title": null,
-    "subtitle": null,
-    "link": null,
-    "linkLabel": null,
-    "description": null,
-    "authorUniversalName": "rotary-international",
-    "authorPublicIdentifier": null,
-    "authorType": "company",
-    "authorName": "Rotary International",
-    "authorLinkedinUrl": "https://www.linkedin.com/company/rotary-international/posts",
-    "authorInfo": "283,369 followers",
-    "authorWebsite": null,
-    "authorWebsiteLabel": null,
-    "authorAvatar": {
-      "url": "https://media.licdn.com/dms/image/v2/C4E0BAQFckn4J8pboCw/company-logo_400_400/company-logo_400_400/0/1630566773837/rotary_international_logo?e=1750896000&v=beta&t=IqU9H3PtakBbPeHG_61tRqYACDDkEZbi1284b3Eq3QQ",
-      "width": 400,
-      "height": 400,
-      "expiresAt": 1750896000000
-    },
-    "postedAgo": "2w",
-    "postImage": null,
-    "postImages": [],
-    "postVideo": {
-      "thumbnailUrl": "https://media.licdn.com/dms/image/v2/D5610AQEpn8L3f8DLdQ/ads-video-thumbnail_720_1280/B56ZYHSdN6HoAc-/0/1743879005323?e=1746140400&v=beta&t=OZystFi8LJCngsBKYogebdPDO2eu5fxXABSLjL2og-M",
-      "videoUrl": "https://dms.licdn.com/playlist/vid/v2/D5610AQEpn8L3f8DLdQ/mp4-720p-30fp-crf28/B56ZYHSdN6HoBw-/0/1743879009948?e=1746140400&v=beta&t=13-hIpkc6Z5qM0YJLTss2FbSeawWxdi8b0chf5GjPZk"
-    },
-    "repostId": null,
-    "newsletterUrl": null,
-    "newsletterTitle": null,
-    "socialContent": {
-      "hideCommentsCount": false,
-      "hideReactionsCount": false,
-      "hideSocialActivityCounts": false,
-      "hideShareAction": false,
-      "hideSendAction": false,
-      "hideRepostsCount": false,
-      "hideViewsCount": false,
-      "hideReactAction": false,
-      "hideCommentAction": false,
-      "shareUrl": "https://www.linkedin.com/posts/rotary-international_endpolio-globalhealth-activity-7314358712113025024-67yZ?utm_source=social_share_send&utm_medium=member_desktop_web&rcm=ACoAAEv_LPcBziubM3KuMdS8HJ_FpZ-4kRH3Hz8",
-      "showContributionExperience": false,
-      "showSocialDetail": true
-    },
-    "engagement": null
-  },
   "engagement": {
-    "likes": 1563,
-    "comments": 400,
-    "shares": 81,
+    "likes": 15,
+    "comments": 5,
+    "shares": 4,
     "reactions": [
       {
         "type": "LIKE",
-        "count": 1363
-      },
-      {
-        "type": "EMPATHY",
-        "count": 86
-      },
-      {
-        "type": "PRAISE",
-        "count": 59
-      },
-      {
-        "type": "APPRECIATION",
-        "count": 40
-      },
-      {
-        "type": "INTEREST",
-        "count": 11
-      },
-      {
-        "type": "ENTERTAINMENT",
-        "count": 4
+        "count": 15
       }
     ]
   }
