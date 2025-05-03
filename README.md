@@ -13,10 +13,10 @@ Our powerful tool helps you search posts by text and filter by LinkedIn profiles
 ## How It Works
 
 - (required) List of search queries (e.g., `Hiring software engineer`, Hiring full stack developer`)
-- (optionally) List of LinkedIn profile/company URLs who posted the content
-- (optionally) List of LinkedIn public identifiers who posted the content (e.g., `williamhgates` from `https://www.linkedin.com/in/williamhgates`)
-- (optionally) List if LinkedIn profile/company IDs who posted the content (e.g. ACoAAA8BYqEBCGLg_vT_ca6mMEqkpp9nVffJ3hc)
-- (optionally) List of LinkedIn companies where authors work (e.g., `Microsoft`, `Google`).
+- (optionally) List of LinkedIn profile/company URLs who posted or re-posted the content
+- (optionally) List of LinkedIn public identifiers who posted or re-posted the content (e.g., `williamhgates` from `https://www.linkedin.com/in/williamhgates`)
+- (optionally) List if LinkedIn profile/company IDs who posted or re-posted the content (e.g. ACoAAA8BYqEBCGLg_vT_ca6mMEqkpp9nVffJ3hc)
+- (optionally) List of LinkedIn companies where authors of posts work (e.g., `Microsoft`, `Google`).
 
 For example you can search posts by Google (or other company) employees who hire software engineers:
 
