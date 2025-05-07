@@ -18,19 +18,6 @@ Our powerful tool helps you search posts by text and filter by LinkedIn profiles
 - (optionally) List if LinkedIn profile/company IDs who posted or re-posted the content (e.g. ACoAAA8BYqEBCGLg_vT_ca6mMEqkpp9nVffJ3hc)
 - (optionally) List of LinkedIn companies where authors of posts work (e.g., `Microsoft`, `Google`).
 
-For example you can search posts by Google (or other company) employees who hire software engineers:
-
-```json
-{
-  "searchQueries": [
-    "Hiring software engineer",
-    "Hiring full stack developer",
-    "Hiring backend developer"
-  ],
-  "authorsCompanyPublicIdentifiers": ["google", "microsoft", "amazon", "meta"]
-}
-```
-
 **This is Post Search scraper, so list of search queries is required. If you don't care about search queries, and you want to scrape all posts from specific companies or authors, our [LinkedIn Profile Posts Scraper](https://apify.com/harvestapi/linkedin-profile-posts) works better for this use-case**
 
 Other params (optionally):
@@ -49,9 +36,20 @@ Other params (optionally):
 - Media: images, videos, and links
 - Content of Re-posts
 
-Up to 1000 posts per one actor run.
-
 ### Sample output data
+
+For example you can search posts by Google (or other company) employees who hire software engineers:
+
+```json
+{
+  "searchQueries": [
+    "Hiring software engineer",
+    "Hiring full stack developer",
+    "Hiring backend developer"
+  ],
+  "authorsCompanyPublicIdentifiers": ["google", "microsoft", "amazon", "meta"]
+}
+```
 
 Here is the example post output of this actor:
 
