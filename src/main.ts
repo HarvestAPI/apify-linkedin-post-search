@@ -29,6 +29,8 @@ interface Input {
   authorsCompanyUrls?: string[];
   authorsCompanyUniversalName?: string[];
   authorsCompanyId?: string[];
+  authorUrls?: string[];
+  authorsCompanies?: string[];
 }
 // Structure of input is defined in input_schema.json
 const input = await Actor.getInput<Input>();
@@ -42,8 +44,10 @@ const query: {
   companyId: string[];
   profilePublicIdentifier: string[];
   profileId: string[];
+  authorsCompany: string[];
   authorsCompanyUniversalName: string[];
   authorsCompanyId: string[];
+  targetUrl: string[];
 } = {
   companyUniversalName: [],
   companyId: [],
@@ -51,6 +55,8 @@ const query: {
   profileId: [],
   authorsCompanyUniversalName: [],
   authorsCompanyId: [],
+  targetUrl: [],
+  authorsCompany: [],
 };
 
 (input.profileUrls || []).forEach((url) => {
@@ -80,9 +86,15 @@ const query: {
 (input.authorsCompanyUrls || []).forEach((url) => {
   query.authorsCompanyUniversalName.push(url);
 });
+(input.authorUrls || []).forEach((targetUrl) => {
+  query.targetUrl.push(targetUrl);
+});
+(input.authorsCompanies || []).forEach((authorsCompany) => {
+  query.authorsCompany.push(authorsCompany);
+});
 
 const scraper = createHarvestApiScraper({
-  concurrency: 5,
+  concurrency: 6,
 });
 
 const promises = input.searchQueries.map((search, index) => {

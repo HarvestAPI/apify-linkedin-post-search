@@ -8,11 +8,12 @@ Our powerful tool helps you search posts by text and filter by LinkedIn profiles
 - Low pricing: $2 per 1k posts.
 - Fast response times deliver data in seconds 🚀
 - No caching, fresh data.
-- Concurrency: each actor works scraping 5 search queries at a time.
+- Concurrency: each actor works scraping 6 search queries at a time.
 
 ## How It Works
+`targetUrls` List of LinkedIn profile/company URLs who posted or re-posted the content.
 
-- (required) List of search queries (e.g., `Hiring software engineer`, Hiring full stack developer`)
+- (required) List of search queries (e.g., `property for sale in Florida`)
 - (optionally) List of LinkedIn profile/company URLs who posted or re-posted the content
 - (optionally) List of LinkedIn public identifiers who posted or re-posted the content (e.g., `williamhgates` from `https://www.linkedin.com/in/williamhgates`)
 - (optionally) List if LinkedIn profile/company IDs who posted or re-posted the content (e.g. ACoAAA8BYqEBCGLg_vT_ca6mMEqkpp9nVffJ3hc)
@@ -121,4 +122,5 @@ The actor stores results in a dataset. You can export data in various formats su
 We continuously enhance our tools based on user feedback. If you encounter technical issues or have suggestions for improvement:
 
 - Create an issue on the actor’s Issues tab in Apify Console
-- Contacts us at contact@harvest-api.com
+- Chat with us on our [Discord server](https://discord.gg/TGA9k9u2gE)
+- Or contact us at contact@harvest-api.com

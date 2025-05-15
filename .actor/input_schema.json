@@ -8,11 +8,7 @@
       "type": "array",
       "editor": "stringList",
       "description": "Queries to search LinkedIn posts. The same query as you would use in the LinkedIn search bar.",
-      "prefill": [
-        "Hiring software engineer",
-        "Hiring full stack developer",
-        "Hiring backend developer"
-      ]
+      "prefill": ["property for sale in Florida"]
     },
 
     "postedLimit": {
@@ -32,19 +28,38 @@
       "prefill": "relevance"
     },
 
+    "authorUrls": {
+      "title": "Profile or Company URLs who posted",
+      "type": "array",
+      "editor": "stringList",
+      "description": "List of LinkedIn profile or company URLs to scrape. Example: `https://www.linkedin.com/in/williamhgates` will fetch posted or re-posted content by Bill Gates."
+    },
+    "authorsCompanies": {
+      "title": "Companies where authors work",
+      "type": "array",
+      "editor": "stringList",
+      "description": "Scrape posts of profile-authors who assigned to LinkedIn Company Names of these companies. Example: `Google` will fetch posts of Google employees or ex-employees in some cases."
+    },
+
+    "maxPosts": {
+      "title": "Maximum number of posts to scrape per each search query (overrides pagination)",
+      "type": "integer",
+      "description": "Maximum number of posts to scrape per each search query. This overrides pagination. If you set this to 0, it will scrape all posts.",
+      "prefill": 10
+    },
+
     "authorsCompanyUrls": {
+      "sectionCaption": "Advanced",
       "title": "Author's Company URLs",
       "type": "array",
       "editor": "stringList",
-      "description": "Scrape posts of profile-authors who assigned to LinkedIn URL of these companies. Example: `https://www.linkedin.com/company/google` will fetch posts of Google employees or ex-employees in some cases.",
-      "prefill": ["https://www.linkedin.com/company/google"]
+      "description": "Scrape posts of profile-authors who assigned to LinkedIn URL of these companies. Example: `https://www.linkedin.com/company/google` will fetch posts of Google employees or ex-employees in some cases."
     },
     "authorsCompanyPublicIdentifiers": {
       "title": "Author's Company Public Identifiers (last part in the URL)",
       "type": "array",
       "editor": "stringList",
-      "description": "Scrape posts of profile-authors who assigned to LinkedIn Public Identifiers of these companies. Example: `google` will fetch posts of Google employees or ex-employees in some cases.",
-      "prefill": ["microsoft", "amazon", "meta"]
+      "description": "Scrape posts of profile-authors who assigned to LinkedIn Public Identifiers of these companies. Example: `google` will fetch posts of Google employees or ex-employees in some cases."
     },
     "authorsCompanyIds": {
       "title": "Author's LinkedIn Company IDs",
@@ -89,13 +104,6 @@
       "type": "array",
       "editor": "stringList",
       "description": "List of LinkedIn company IDs to scrape. Example: `1441`."
-    },
-
-    "maxPosts": {
-      "title": "Maximum number of posts to scrape per each input (overrides pagination)",
-      "type": "integer",
-      "description": "Maximum number of posts to scrape per each search query. This overrides pagination. If you set this to 0, it will scrape all posts.",
-      "prefill": 10
     },
 
     "scrapePages": {
