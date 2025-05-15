@@ -8,7 +8,7 @@
       "type": "array",
       "editor": "stringList",
       "description": "Queries to search LinkedIn posts. The same query as you would use in the LinkedIn search bar.",
-      "prefill": ["property for sale in Florida"]
+      "prefill": ["hiring software engineer"]
     },
 
     "postedLimit": {
@@ -38,7 +38,8 @@
       "title": "Companies where authors work",
       "type": "array",
       "editor": "stringList",
-      "description": "Scrape posts of profile-authors who assigned to LinkedIn Company Names of these companies. Example: `Google` will fetch posts of Google employees or ex-employees in some cases."
+      "description": "Scrape posts of profile-authors who assigned to LinkedIn Company Names of these companies. Example: `Google` will fetch posts of Google employees or ex-employees in some cases.",
+      "prefill": ["google", "amazon"]
     },
 
     "maxPosts": {
