@@ -59,6 +59,10 @@ export function createHarvestApiScraper({
             console.warn(`Max scraped items reached: ${actorMaxPaidDatasetItems}`);
             break;
           }
+          if (maxPosts && postsCounter >= maxPosts) {
+            break;
+          }
+
           let postsOnPageCounter = 0;
 
           const queryParams = new URLSearchParams({
@@ -109,7 +113,7 @@ export function createHarvestApiScraper({
                   );
 
                   const { reactions } = await scrapeReactionsForPost({
-                    postId: post.id,
+                    post,
                     state,
                     input,
                     concurrency: reactionsConcurrency,
@@ -119,7 +123,7 @@ export function createHarvestApiScraper({
                   });
 
                   const { comments } = await scrapeCommentsForPost({
-                    postId: post.id,
+                    post,
                     state,
                     input,
                     concurrency: reactionsConcurrency,

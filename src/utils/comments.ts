@@ -6,13 +6,13 @@ const { actorId, actorRunId, actorBuildId, userId, actorMaxPaidDatasetItems, mem
   Actor.getEnv();
 
 export async function scrapeCommentsForPost({
-  postId,
+  post,
   state,
   input,
   concurrency,
 }: {
   input: Input;
-  postId: string;
+  post: { id: string; linkedinUrl: string };
   state: { itemsLeft: number };
   concurrency: number;
 }): Promise<{
@@ -44,19 +44,20 @@ export async function scrapeCommentsForPost({
 
   await scraperLib.scrapePostComments({
     query: {
-      post: postId,
+      post: post.linkedinUrl || post.id,
     },
     outputType: 'callback',
     onItemScraped: async ({ item }) => {
       if (!item.id) return;
       itemsCounter++;
       delete (item as any).postId;
-      console.info(`Scraped comment ${itemsCounter} for post ${postId}`);
+      (item as any).postId = post.id;
+
+      console.info(`Scraped comment ${itemsCounter} for post ${post.id}`);
 
       comments.push(item);
       await Actor.pushData({
         type: 'comment',
-        postId: postId,
         ...(item as any),
       });
     },

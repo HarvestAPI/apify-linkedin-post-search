@@ -5,48 +5,14 @@ import { createLinkedinScraper } from '@harvestapi/scraper';
 const { actorId, actorRunId, actorBuildId, userId, actorMaxPaidDatasetItems, memoryMbytes } =
   Actor.getEnv();
 
-export async function scrapeAllReactions({
-  scrapedPostsPerProfile,
-  state,
-  input,
-  concurrency,
-}: {
-  input: Input;
-  scrapedPostsPerProfile: Record<string, Record<string, boolean>>;
-  state: { itemsLeft: number };
-  concurrency: number;
-}) {
-  if (!input.scrapeReactions || state.itemsLeft <= 0) {
-    return;
-  }
-  const postIds = new Set<string>();
-
-  console.info('Scraping reactions...');
-
-  for (const posts of Object.values(scrapedPostsPerProfile)) {
-    for (const postId of Object.keys(posts)) {
-      postIds.add(postId);
-    }
-  }
-
-  for (const postId of postIds) {
-    await scrapeReactionsForPost({
-      postId,
-      state,
-      input,
-      concurrency,
-    });
-  }
-}
-
 export async function scrapeReactionsForPost({
-  postId,
+  post,
   state,
   input,
   concurrency,
 }: {
   input: Input;
-  postId: string;
+  post: { id: string; linkedinUrl: string };
   state: { itemsLeft: number };
   concurrency: number;
 }): Promise<{
@@ -79,19 +45,20 @@ export async function scrapeReactionsForPost({
 
   await scraperLib.scrapePostReactions({
     query: {
-      post: postId,
+      post: post.linkedinUrl || post.id,
     },
     outputType: 'callback',
     onItemScraped: async ({ item }) => {
       if (!item.id) return;
       postReactionsCounter++;
       delete (item as any).postId;
-      console.info(`Scraped reaction ${postReactionsCounter} for post ${postId}`);
+      (item as any).postId = post.id;
+
+      console.info(`Scraped reaction ${postReactionsCounter} for post ${post.id}`);
 
       reactions.push(item);
       await Actor.pushData({
         type: 'reaction',
-        postId: postId,
         ...item,
       });
     },
