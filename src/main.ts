@@ -107,7 +107,7 @@ const state: {
 };
 
 const scraper = createHarvestApiScraper({
-  concurrency: input.scrapeReactions ? 1 : 6,
+  concurrency: input.scrapeReactions || input.scrapeComments ? 1 : 6,
   state,
   input,
   reactionsConcurrency: 6,
