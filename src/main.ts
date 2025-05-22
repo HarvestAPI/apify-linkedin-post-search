@@ -110,10 +110,10 @@ const state: {
 };
 
 const scraper = createHarvestApiScraper({
-  concurrency: input.scrapeReactions || input.scrapeComments ? 1 : 6,
+  concurrency: 6,
   state,
   input,
-  reactionsConcurrency: 6,
+  reactionsConcurrency: 2,
 });
 
 const promises = input.searchQueries.map((search, index) => {
