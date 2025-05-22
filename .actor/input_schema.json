@@ -50,6 +50,7 @@
     },
 
     "scrapeReactions": {
+      "sectionCaption": "Reactions",
       "title": "Scrape Reactions",
       "type": "boolean",
       "description": "Scrape reactions of posts.",
@@ -62,6 +63,7 @@
       "prefill": 5
     },
     "scrapeComments": {
+      "sectionCaption": "Comments",
       "title": "Scrape Comments",
       "type": "boolean",
       "description": "Scrape comments of posts.",
