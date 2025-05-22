@@ -1,6 +1,6 @@
 ## LinkedIn Posts Search scraper
 
-Our powerful tool helps you search posts by text and filter by LinkedIn profiles or companies without compromising security or violating platform policies. Extract full post data, engagement metrics, and additionally scrape reactions and comments. This is a greatly helps with engagement analysis and outreach purposes.
+Our powerful tool helps you search posts by text and filter by LinkedIn profiles or companies without compromising security or violating platform policies. Extract full post data, engagement metrics, and additionally scrape reactions and comments. This greatly helps with engagement analysis and outreach purposes.
 
 ### Key Benefits
 
