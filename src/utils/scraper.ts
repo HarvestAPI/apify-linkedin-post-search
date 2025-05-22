@@ -1,16 +1,29 @@
 import { Actor } from 'apify';
 import { createConcurrentQueues } from './queue.js';
+import { scrapeReactionsForPost } from './reactions.js';
+import { Input } from '../main.js';
+import { scrapeCommentsForPost } from './comments.js';
 
 const { actorId, actorRunId, actorBuildId, userId, actorMaxPaidDatasetItems, memoryMbytes } =
   Actor.getEnv();
 
-export function createHarvestApiScraper({ concurrency }: { concurrency: number }) {
+export function createHarvestApiScraper({
+  concurrency,
+  state,
+  input,
+  reactionsConcurrency,
+}: {
+  state: { itemsLeft: number };
+  input: Input;
+  concurrency: number;
+  reactionsConcurrency: number;
+}) {
   let processedProfilesCounter = 0;
-  let processedPostsCounter = 0;
 
   const scrapedPostsPerProfile: Record<string, Record<string, boolean>> = {};
 
   return {
+    scrapedPostsPerProfile,
     addJob: createConcurrentQueues(
       concurrency,
       async ({
@@ -28,21 +41,21 @@ export function createHarvestApiScraper({ concurrency }: { concurrency: number }
         index: number;
         total: number;
       }) => {
-        if (actorMaxPaidDatasetItems && processedPostsCounter >= actorMaxPaidDatasetItems) {
+        if (state.itemsLeft <= 0) {
           console.warn(`Max scraped items reached: ${actorMaxPaidDatasetItems}`);
           return;
         }
         const entityKey = search;
 
         console.info(`Fetching posts for ${entityKey}...`);
-        const timestamp = new Date();
+        // const timestamp = new Date();
         let postsCounter = 0;
 
         const startPage = Number(params.page) || 1;
         const endPage = typeof maxPosts === 'number' ? 200 : startPage + (Number(scrapePages) || 1);
 
         for (let i = startPage; i < endPage; i++) {
-          if (actorMaxPaidDatasetItems && processedPostsCounter >= actorMaxPaidDatasetItems) {
+          if (state.itemsLeft <= 0) {
             console.warn(`Max scraped items reached: ${actorMaxPaidDatasetItems}`);
             break;
           }
@@ -76,7 +89,7 @@ export function createHarvestApiScraper({ concurrency }: { concurrency: number }
 
           if (response.elements && response.status < 400) {
             for (const post of response.elements) {
-              if (actorMaxPaidDatasetItems && processedPostsCounter >= actorMaxPaidDatasetItems) {
+              if (state.itemsLeft <= 0) {
                 console.warn(`Max scraped items reached: ${actorMaxPaidDatasetItems}`);
                 break;
               }
@@ -90,9 +103,37 @@ export function createHarvestApiScraper({ concurrency }: { concurrency: number }
                   scrapedPostsPerProfile[entityKey][post.id] = true;
                   postsCounter++;
                   postsOnPageCounter++;
-                  processedPostsCounter++;
-                  console.info(`Scraped post id ${post.id} for ${entityKey}`);
-                  await Actor.pushData(post);
+                  state.itemsLeft -= 1;
+                  console.info(
+                    `Scraped post #${processedProfilesCounter}_${postsCounter} id:${post.id} for ${entityKey}`,
+                  );
+
+                  const { reactions } = await scrapeReactionsForPost({
+                    postId: post.id,
+                    state,
+                    input,
+                    concurrency: reactionsConcurrency,
+                  }).catch((error) => {
+                    console.error(`Error scraping reactions for post ${post.id}:`, error);
+                    return { reactions: [] };
+                  });
+
+                  const { comments } = await scrapeCommentsForPost({
+                    postId: post.id,
+                    state,
+                    input,
+                    concurrency: reactionsConcurrency,
+                  }).catch((error) => {
+                    console.error(`Error scraping comments for post ${post.id}:`, error);
+                    return { comments: [] };
+                  });
+
+                  await Actor.pushData({
+                    type: 'post',
+                    ...post,
+                    reactions,
+                    comments,
+                  });
                 }
               }
             }
@@ -112,7 +153,7 @@ export function createHarvestApiScraper({ concurrency }: { concurrency: number }
           }
         }
 
-        const elapsed = new Date().getTime() - timestamp.getTime();
+        // const elapsed = new Date().getTime() - timestamp.getTime();
         processedProfilesCounter++;
 
         console.info(
