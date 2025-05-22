@@ -41,8 +41,11 @@ export interface Input {
 const input = await Actor.getInput<Input>();
 if (!input) throw new Error('Input is missing!');
 input.searchQueries = (input.searchQueries || []).filter((q) => q && !!q.trim());
-if (!input.searchQueries?.length)
-  throw new Error('Search queries: at least one query is required!');
+if (!input.searchQueries?.length) {
+  console.error('Search queries: at least one query is required!');
+  await Actor.exit();
+  process.exit(0);
+}
 
 const query: {
   companyUniversalName: string[];
