@@ -1,7 +1,7 @@
 import { Actor } from 'apify';
 import { createConcurrentQueues } from './queue.js';
 import { scrapeReactionsForPost } from './reactions.js';
-import { Input } from '../main.js';
+import { Input, ScraperState } from '../main.js';
 import { scrapeCommentsForPost } from './comments.js';
 
 const { actorId, actorRunId, actorBuildId, userId, actorMaxPaidDatasetItems, memoryMbytes } =
@@ -13,7 +13,7 @@ export function createHarvestApiScraper({
   input,
   reactionsConcurrency,
 }: {
-  state: { itemsLeft: number };
+  state: ScraperState;
   input: Input;
   concurrency: number;
   reactionsConcurrency: number;
@@ -132,7 +132,7 @@ export function createHarvestApiScraper({
                     return { comments: [] };
                   });
 
-                  await Actor.pushData({
+                  state.datasetLastPushPromise = Actor.pushData({
                     type: 'post',
                     ...post,
                     reactions,
