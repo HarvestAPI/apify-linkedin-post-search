@@ -52,6 +52,7 @@ export function createHarvestApiScraper({
         const startPage = Number(params.page) || 1;
         const endPage = typeof maxPosts === 'number' ? 200 : startPage + (Number(scrapePages) || 1);
         let maxDateReached = false;
+        let paginationToken: string = '';
 
         for (let i = startPage; i < endPage; i++) {
           if (state.itemsLeft <= 0) {
@@ -70,6 +71,7 @@ export function createHarvestApiScraper({
           const queryParams = new URLSearchParams({
             ...params,
             page: String(i),
+            paginationToken,
           });
 
           const response = await fetch(
@@ -91,6 +93,8 @@ export function createHarvestApiScraper({
               console.error(`Error fetching posts:`, error);
               return {};
             });
+
+          paginationToken = response?.pagination?.paginationToken;
 
           if (response.elements && response.status < 400) {
             for (const post of response.elements) {
