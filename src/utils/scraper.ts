@@ -105,9 +105,6 @@ export function createHarvestApiScraper({
               if (maxPosts && postsCounter >= maxPosts) {
                 break;
               }
-              if (maxDateReached) {
-                break;
-              }
 
               if (params.postedLimit) {
                 let maxDate: Date | null = null;
