@@ -28,13 +28,11 @@ export function createHarvestApiScraper({
       concurrency,
       async ({
         index,
-        search,
         params,
         scrapePages,
         maxPosts,
         total,
       }: {
-        search: string;
         params: Record<string, string | string[]>;
         scrapePages: number;
         maxPosts: number | null;
@@ -45,7 +43,7 @@ export function createHarvestApiScraper({
           console.warn(`Max scraped items reached: ${actorMaxPaidDatasetItems}`);
           return;
         }
-        const entityKey = search;
+        const entityKey = JSON.stringify(params);
 
         console.info(`Fetching posts for ${entityKey}...`);
         // const timestamp = new Date();
@@ -53,6 +51,7 @@ export function createHarvestApiScraper({
 
         const startPage = Number(params.page) || 1;
         const endPage = typeof maxPosts === 'number' ? 200 : startPage + (Number(scrapePages) || 1);
+        let maxDateReached = false;
 
         for (let i = startPage; i < endPage; i++) {
           if (state.itemsLeft <= 0) {
@@ -62,12 +61,14 @@ export function createHarvestApiScraper({
           if (maxPosts && postsCounter >= maxPosts) {
             break;
           }
+          if (maxDateReached) {
+            break;
+          }
 
           let postsOnPageCounter = 0;
 
           const queryParams = new URLSearchParams({
             ...params,
-            search,
             page: String(i),
           });
 
@@ -99,6 +100,31 @@ export function createHarvestApiScraper({
               }
               if (maxPosts && postsCounter >= maxPosts) {
                 break;
+              }
+              if (maxDateReached) {
+                break;
+              }
+
+              if (params.postedLimit) {
+                let maxDate: Date | null = null;
+                if (params.postedLimit === '24h') {
+                  maxDate = new Date(Date.now() - 24 * 60 * 60 * 1000);
+                } else if (params.postedLimit === 'week') {
+                  maxDate = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+                } else if (params.postedLimit === 'month') {
+                  maxDate = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+                }
+
+                const postPostedDate = post?.postedAt?.timestamp
+                  ? new Date(post?.postedAt?.timestamp)
+                  : null;
+
+                if (maxDate && postPostedDate) {
+                  if (maxDate.getTime() > postPostedDate.getTime()) {
+                    maxDateReached = true;
+                    continue;
+                  }
+                }
               }
 
               if (post.id) {

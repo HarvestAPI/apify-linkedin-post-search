@@ -31,6 +31,7 @@ export interface Input {
   authorsCompanyId?: string[];
   authorUrls?: string[];
   authorsCompanies?: string[];
+  targetUrls?: string[];
 
   scrapeReactions?: boolean;
   maxReactions?: number;
@@ -41,11 +42,6 @@ export interface Input {
 const input = await Actor.getInput<Input>();
 if (!input) throw new Error('Input is missing!');
 input.searchQueries = (input.searchQueries || []).filter((q) => q && !!q.trim());
-if (!input.searchQueries?.length) {
-  console.error('Search queries: at least one query is required!');
-  await Actor.exit();
-  process.exit(0);
-}
 
 const query: {
   companyUniversalName: string[];
@@ -97,6 +93,9 @@ const query: {
 (input.authorUrls || []).forEach((targetUrl) => {
   query.targetUrl.push(targetUrl);
 });
+(input.targetUrls || []).forEach((targetUrl) => {
+  query.targetUrl.push(targetUrl);
+});
 (input.authorsCompanies || []).forEach((authorsCompany) => {
   query.authorsCompany.push(authorsCompany);
 });
@@ -118,13 +117,13 @@ const scraper = createHarvestApiScraper({
   reactionsConcurrency: 2,
 });
 
-const promises = input.searchQueries.map((search, index) => {
+const searchPromises = input.searchQueries.map((search, index) => {
   return scraper.addJob({
-    search,
     params: {
       postedLimit: input.postedLimit,
       sortBy: input.sortBy,
       page: input.page || '1',
+      search,
       ...query,
     },
     scrapePages: Number(input.scrapePages),
@@ -134,7 +133,41 @@ const promises = input.searchQueries.map((search, index) => {
   });
 });
 
-await Promise.all([...promises]).catch((error) => {
+if (!input.searchQueries?.length) {
+  const profiles = [
+    ...(query.profileId || []).map((profileId) => ({ profileId })),
+    ...(query.profilePublicIdentifier || []).map((profilePublicIdentifier) => ({
+      profilePublicIdentifier,
+    })),
+    ...(query.targetUrl || []).map((targetUrl) => ({ targetUrl })),
+    ...(query.companyId || []).map((companyId) => ({ companyId })),
+    ...(query.companyUniversalName || []).map((companyUniversalName) => ({ companyUniversalName })),
+  ];
+
+  const commonArgs = {
+    scrapePages: Number(input.scrapePages),
+    maxPosts: input.maxPosts === 0 || input.maxPosts === '0' ? 0 : Number(input.maxPosts) || null,
+    total: profiles.length,
+  };
+
+  const profilePromises = [
+    ...[...profiles].map((profile, index) => {
+      return scraper.addJob({
+        params: {
+          ...profile,
+          postedLimit: input.postedLimit,
+          sortBy: input.postedLimit ? 'date' : input.sortBy,
+          page: input.page || '1',
+        },
+        index: index,
+        ...commonArgs,
+      });
+    }),
+  ];
+  searchPromises.push(...profilePromises);
+}
+
+await Promise.all([...searchPromises]).catch((error) => {
   console.error(`Error scraping profiles:`, error);
 });
 
