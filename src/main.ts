@@ -100,6 +100,14 @@ const query: {
   query.authorsCompany.push(authorsCompany);
 });
 
+input.searchQueries = input.searchQueries.filter((search) => {
+  if (search.startsWith('https://') || search.startsWith('http://')) {
+    query.targetUrl.push(search);
+    return false; // Remove from search queries
+  }
+  return true;
+});
+
 const { actorMaxPaidDatasetItems } = Actor.getEnv();
 
 export type ScraperState = {
