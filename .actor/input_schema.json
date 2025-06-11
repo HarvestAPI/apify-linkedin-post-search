@@ -74,14 +74,6 @@
       "prefill": 5
     },
 
-    "authorsCompanyUrls": {
-      "sectionCaption": "Advanced",
-      "title": "Author's Company URLs",
-      "type": "array",
-      "editor": "stringList",
-      "description": "Scrape posts of profile-authors who assigned to LinkedIn URL of these companies. Example: `https://www.linkedin.com/company/google` will fetch posts of Google employees or ex-employees in some cases."
-    },
-
     "scrapePages": {
       "title": "Number of pages to scrape",
       "type": "integer",
