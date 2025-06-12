@@ -21,6 +21,8 @@ export async function scrapeCommentsForPost({
   if (!input.scrapeComments || state.itemsLeft <= 0) {
     return { comments: [] };
   }
+  const client = Actor.newClient();
+  const user = userId ? await client.user(userId).get() : null;
 
   const scraperLib = createLinkedinScraper({
     apiKey: process.env.HARVESTAPI_TOKEN!,
@@ -32,6 +34,8 @@ export async function scrapeCommentsForPost({
       'x-apify-actor-build-id': actorBuildId!,
       'x-apify-memory-mbytes': String(memoryMbytes),
       'x-apify-actor-max-paid-dataset-items': String(actorMaxPaidDatasetItems) || '0',
+      'x-apify-username': user?.username || '',
+      'x-apify-user-is-paying': (user as Record<string, any> | null)?.isPaying,
     },
   });
 

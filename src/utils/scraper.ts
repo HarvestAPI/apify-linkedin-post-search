@@ -7,7 +7,7 @@ import { scrapeCommentsForPost } from './comments.js';
 const { actorId, actorRunId, actorBuildId, userId, actorMaxPaidDatasetItems, memoryMbytes } =
   Actor.getEnv();
 
-export function createHarvestApiScraper({
+export async function createHarvestApiScraper({
   concurrency,
   state,
   input,
@@ -21,6 +21,8 @@ export function createHarvestApiScraper({
   let processedProfilesCounter = 0;
 
   const scrapedPostsPerProfile: Record<string, Record<string, boolean>> = {};
+  const client = Actor.newClient();
+  const user = userId ? await client.user(userId).get() : null;
 
   return {
     scrapedPostsPerProfile,
@@ -85,6 +87,8 @@ export function createHarvestApiScraper({
                 'x-apify-actor-build-id': actorBuildId!,
                 'x-apify-memory-mbytes': String(memoryMbytes),
                 'x-apify-actor-max-paid-dataset-items': String(actorMaxPaidDatasetItems) || '0',
+                'x-apify-username': user?.username || '',
+                'x-apify-user-is-paying': (user as Record<string, any> | null)?.isPaying,
               },
             },
           )
