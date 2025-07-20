@@ -32,6 +32,7 @@ export interface Input {
   authorUrls?: string[];
   authorsCompanies?: string[];
   targetUrls?: string[];
+  commentsPostedLimit?: 'any' | '24h' | 'week' | 'month';
 
   scrapeReactions?: boolean;
   maxReactions?: number;
@@ -42,6 +43,8 @@ export interface Input {
 const input = await Actor.getInput<Input>();
 if (!input) throw new Error('Input is missing!');
 input.searchQueries = (input.searchQueries || []).filter((q) => q && !!q.trim());
+
+const originalInput = JSON.parse(JSON.stringify(input)); // deep copy to avoid mutation
 
 const query: {
   companyUniversalName: string[];
@@ -122,6 +125,7 @@ const scraper = await createHarvestApiScraper({
   concurrency: 6,
   state,
   input,
+  originalInput,
   reactionsConcurrency: 2,
 });
 

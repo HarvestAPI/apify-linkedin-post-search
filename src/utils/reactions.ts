@@ -10,11 +10,13 @@ export async function scrapeReactionsForPost({
   state,
   input,
   concurrency,
+  originalInput,
 }: {
   input: Input;
   post: { id: string; linkedinUrl: string };
   state: ScraperState;
   concurrency: number;
+  originalInput: Input;
 }): Promise<{
   reactions: any[];
 }> {
@@ -64,6 +66,7 @@ export async function scrapeReactionsForPost({
       state.datasetLastPushPromise = Actor.pushData({
         type: 'reaction',
         ...item,
+        input: originalInput,
       });
     },
     overrideConcurrency: concurrency,

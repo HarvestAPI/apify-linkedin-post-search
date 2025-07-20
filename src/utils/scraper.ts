@@ -11,10 +11,12 @@ export async function createHarvestApiScraper({
   concurrency,
   state,
   input,
+  originalInput,
   reactionsConcurrency,
 }: {
   state: ScraperState;
   input: Input;
+  originalInput: Input;
   concurrency: number;
   reactionsConcurrency: number;
 }) {
@@ -147,6 +149,7 @@ export async function createHarvestApiScraper({
                     post,
                     state,
                     input,
+                    originalInput,
                     concurrency: reactionsConcurrency,
                   }).catch((error) => {
                     console.error(`Error scraping reactions for post ${post.id}:`, error);
@@ -157,6 +160,7 @@ export async function createHarvestApiScraper({
                     post,
                     state,
                     input,
+                    originalInput,
                     concurrency: reactionsConcurrency,
                   }).catch((error) => {
                     console.error(`Error scraping comments for post ${post.id}:`, error);
@@ -168,6 +172,7 @@ export async function createHarvestApiScraper({
                     ...post,
                     reactions,
                     comments,
+                    input: originalInput,
                   });
                 }
               }

@@ -67,6 +67,13 @@
       "description": "Scrape comments of posts.",
       "prefill": false
     },
+    "commentsPostedLimit": {
+      "title": "Comments Posted Limit (filter)",
+      "type": "string",
+      "description": "Fetch comments no older than X time. Options: '24h', 'week', 'month'.",
+      "editor": "select",
+      "enum": ["any", "24h", "week", "month"]
+    },
     "maxComments": {
       "title": "Maximum number of comments to scrape per post",
       "type": "integer",
