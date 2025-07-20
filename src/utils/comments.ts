@@ -52,7 +52,7 @@ export async function scrapeCommentsForPost({
   await scraperLib.scrapePostComments({
     query: {
       post: post.linkedinUrl || post.id,
-      postedLimit: input.commentsPostedLimit,
+      postedLimit: input.commentsPostedLimit === 'any' ? undefined : input.commentsPostedLimit,
     },
     outputType: 'callback',
     onItemScraped: async ({ item }) => {

@@ -79,17 +79,6 @@
       "type": "integer",
       "description": "Maximum number of comments to scrape per post. Default is 5.",
       "prefill": 5
-    },
-
-    "scrapePages": {
-      "title": "Number of pages to scrape",
-      "type": "integer",
-      "description": "Number of pages to scrape from the profile. Default is 1. Page size is about 20 posts."
-    },
-    "page": {
-      "title": "Page number to start scraping from",
-      "type": "integer",
-      "description": "Page number to start scraping from. Default is 1. Page size is about 20 posts."
     }
   }
 }
