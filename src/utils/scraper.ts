@@ -167,13 +167,20 @@ export async function createHarvestApiScraper({
                     return { comments: [] };
                   });
 
+                  const query = Object.fromEntries(queryParams);
+                  for (const key of Object.keys(query)) {
+                    if (!query[key] || query[key] === 'undefined') {
+                      delete query[key];
+                    }
+                  }
+
                   state.datasetLastPushPromise = Actor.pushData({
                     type: 'post',
                     ...post,
                     reactions,
                     comments,
                     input: originalInput,
-                    query: Object.fromEntries(queryParams),
+                    query: query,
                   });
                 }
               }
