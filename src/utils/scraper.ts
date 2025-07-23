@@ -173,6 +173,7 @@ export async function createHarvestApiScraper({
                     reactions,
                     comments,
                     input: originalInput,
+                    query: queryParams,
                   });
                 }
               }

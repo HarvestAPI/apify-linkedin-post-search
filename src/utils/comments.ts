@@ -48,12 +48,13 @@ export async function scrapeCommentsForPost({
     maxComments = state.itemsLeft;
   }
   const comments: any[] = [];
+  const query = {
+    post: post.linkedinUrl || post.id,
+    postedLimit: input.commentsPostedLimit === 'any' ? undefined : input.commentsPostedLimit,
+  };
 
   await scraperLib.scrapePostComments({
-    query: {
-      post: post.linkedinUrl || post.id,
-      postedLimit: input.commentsPostedLimit === 'any' ? undefined : input.commentsPostedLimit,
-    },
+    query: query,
     outputType: 'callback',
     onItemScraped: async ({ item }) => {
       if (!item.id) return;
@@ -68,6 +69,7 @@ export async function scrapeCommentsForPost({
         type: 'comment',
         ...(item as any),
         input: originalInput,
+        query,
       });
     },
     overrideConcurrency: concurrency,

@@ -48,11 +48,12 @@ export async function scrapeReactionsForPost({
   }
 
   const reactions: any[] = [];
+  const query = {
+    post: post.linkedinUrl || post.id,
+  };
 
   await scraperLib.scrapePostReactions({
-    query: {
-      post: post.linkedinUrl || post.id,
-    },
+    query: query,
     outputType: 'callback',
     onItemScraped: async ({ item }) => {
       if (!item.id) return;
@@ -67,6 +68,7 @@ export async function scrapeReactionsForPost({
         type: 'reaction',
         ...item,
         input: originalInput,
+        query,
       });
     },
     overrideConcurrency: concurrency,

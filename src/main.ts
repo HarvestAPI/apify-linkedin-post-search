@@ -32,12 +32,12 @@ export interface Input {
   authorUrls?: string[];
   authorsCompanies?: string[];
   targetUrls?: string[];
-  commentsPostedLimit?: 'any' | '24h' | 'week' | 'month';
 
   scrapeReactions?: boolean;
   maxReactions?: number;
   scrapeComments?: boolean;
   maxComments?: number;
+  commentsPostedLimit?: 'any' | '24h' | 'week' | 'month';
 }
 // Structure of input is defined in input_schema.json
 const input = await Actor.getInput<Input>();
