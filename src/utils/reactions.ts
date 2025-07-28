@@ -64,7 +64,7 @@ export async function scrapeReactionsForPost({
       console.info(`Scraped reaction ${postReactionsCounter} for post ${post.id}`);
 
       reactions.push(item);
-      state.datasetLastPushPromise = Actor.pushData({
+      await Actor.pushData({
         type: 'reaction',
         ...item,
         input: originalInput,
