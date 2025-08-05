@@ -7,6 +7,12 @@ import { scrapeCommentsForPost } from './comments.js';
 const { actorId, actorRunId, actorBuildId, userId, actorMaxPaidDatasetItems, memoryMbytes } =
   Actor.getEnv();
 
+const pushPostData = createConcurrentQueues(190, async (item: Record<string, any>) => {
+  await Actor.pushData({
+    ...item,
+  });
+});
+
 export async function createHarvestApiScraper({
   concurrency,
   state,
@@ -174,7 +180,7 @@ export async function createHarvestApiScraper({
                     }
                   }
 
-                  await Actor.pushData({
+                  await pushPostData({
                     type: 'post',
                     ...post,
                     reactions,
