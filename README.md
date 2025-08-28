@@ -14,7 +14,7 @@ Our powerful tool helps you search posts by text and filter by LinkedIn profiles
 
 `targetUrls` List of LinkedIn profile/company URLs who posted or re-posted the content.
 
-- (required) List of search queries (e.g., `property for sale in Florida`)
+- (required) List of search queries (e.g., `b2b sales`). LinkedIn search supports operators for more complex queries, see [Use Boolean search on LinkedIn](https://www.linkedin.com/help/linkedin/answer/a524335). One search query is limited by LinkedIn to 85 characters.
 - (optionally) List of LinkedIn profile/company URLs who posted or re-posted the content
 - (optionally) List of LinkedIn public identifiers who posted or re-posted the content (e.g., `williamhgates` from `https://www.linkedin.com/in/williamhgates`)
 - (optionally) List if LinkedIn profile/company IDs who posted or re-posted the content (e.g. ACoAAA8BYqEBCGLg_vT_ca6mMEqkpp9nVffJ3hc)

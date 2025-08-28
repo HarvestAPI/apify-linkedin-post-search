@@ -8,7 +8,7 @@
       "type": "array",
       "editor": "stringList",
       "description": "Queries to search LinkedIn posts. The same query as you would use in the LinkedIn search bar.",
-      "prefill": ["hiring software engineer"]
+      "prefill": ["b2b sales"]
     },
 
     "postedLimit": {
