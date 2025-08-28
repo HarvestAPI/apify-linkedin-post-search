@@ -20,7 +20,7 @@ Our powerful tool helps you search posts by text and filter by LinkedIn profiles
 - (optionally) List if LinkedIn profile/company IDs who posted or re-posted the content (e.g. ACoAAA8BYqEBCGLg_vT_ca6mMEqkpp9nVffJ3hc)
 - (optionally) List of LinkedIn companies where authors of posts work (e.g., `Microsoft`, `Google`).
 
-**This is Post Search scraper, so list of search queries is required. If you don't care about search queries, and you want to scrape all posts from specific companies or authors, our [LinkedIn Profile Posts Scraper](https://apify.com/harvestapi/linkedin-profile-posts) works better for this use-case**
+Note: This is Post Search scraper, so list of search queries is required. If you don't need to scrape specific search queries, and you want to scrape all posts from specific companies or authors, our [LinkedIn Profile Posts Scraper](https://apify.com/harvestapi/linkedin-profile-posts) works better for this use-case
 
 Additional content:
 
