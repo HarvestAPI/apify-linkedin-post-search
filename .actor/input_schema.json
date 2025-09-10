@@ -37,7 +37,7 @@
       "type": "array",
       "editor": "stringList",
       "description": "List of LinkedIn profile or company URLs to scrape. Example: `https://www.linkedin.com/in/williamhgates` will fetch posted or re-posted content by Bill Gates.",
-      "maximum": 20
+      "maxItems": 20
     },
     "authorsCompanies": {
       "title": "Companies where authors work",
@@ -45,7 +45,7 @@
       "editor": "stringList",
       "description": "Scrape posts of profile-authors who assigned to LinkedIn Company Names of these companies. Example: `Google` will fetch posts of Google employees or ex-employees in some cases.",
       "prefill": ["google", "amazon"],
-      "maximum": 20
+      "maxItems": 20
     },
 
     "scrapeReactions": {
