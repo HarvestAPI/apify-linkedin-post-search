@@ -10,6 +10,12 @@
       "description": "Queries to search LinkedIn posts. The same query as you would use in the LinkedIn search bar.",
       "prefill": ["b2b sales"]
     },
+    "maxPosts": {
+      "title": "Maximum number of posts to scrape per each search query",
+      "type": "integer",
+      "description": "Maximum number of posts to scrape per each search query. If you set this to 0, it will scrape all posts.",
+      "prefill": 20
+    },
 
     "postedLimit": {
       "title": "Posted Limit (filter)",
@@ -30,21 +36,16 @@
       "title": "Profile or Company URLs who posted",
       "type": "array",
       "editor": "stringList",
-      "description": "List of LinkedIn profile or company URLs to scrape. Example: `https://www.linkedin.com/in/williamhgates` will fetch posted or re-posted content by Bill Gates."
+      "description": "List of LinkedIn profile or company URLs to scrape. Example: `https://www.linkedin.com/in/williamhgates` will fetch posted or re-posted content by Bill Gates.",
+      "maximum": 20
     },
     "authorsCompanies": {
       "title": "Companies where authors work",
       "type": "array",
       "editor": "stringList",
       "description": "Scrape posts of profile-authors who assigned to LinkedIn Company Names of these companies. Example: `Google` will fetch posts of Google employees or ex-employees in some cases.",
-      "prefill": ["google", "amazon"]
-    },
-
-    "maxPosts": {
-      "title": "Maximum number of posts to scrape per each search query (overrides pagination)",
-      "type": "integer",
-      "description": "Maximum number of posts to scrape per each search query. This overrides pagination. If you set this to 0, it will scrape all posts.",
-      "prefill": 10
+      "prefill": ["google", "amazon"],
+      "maximum": 20
     },
 
     "scrapeReactions": {
@@ -77,8 +78,7 @@
     "maxComments": {
       "title": "Maximum number of comments to scrape per post",
       "type": "integer",
-      "description": "Maximum number of comments to scrape per post. Default is 5.",
-      "prefill": 5
+      "description": "Maximum number of comments to scrape per post."
     }
   }
 }
