@@ -95,14 +95,19 @@ export async function createHarvestApiScraper({
 
           let postsOnPageCounter = 0;
 
-          const queryParams = new URLSearchParams({
+          const queryParams = {
             ...params,
             page: String(i),
             ...(paginationToken ? { paginationToken } : {}),
-          });
+          };
+          for (const key of Object.keys(queryParams) as Array<keyof typeof queryParams>) {
+            if (!queryParams[key] || queryParams[key] === 'undefined') {
+              delete queryParams[key];
+            }
+          }
 
           const response: ApiListResponse<PostShort> = await fetch(
-            `${process.env.HARVESTAPI_URL || 'https://api.harvest-api.com'}/linkedin/post-search?${queryParams.toString()}`,
+            `${process.env.HARVESTAPI_URL || 'https://api.harvest-api.com'}/linkedin/post-search?${new URLSearchParams(queryParams).toString()}`,
             {
               headers: {
                 'X-API-Key': process.env.HARVESTAPI_TOKEN!,
@@ -184,19 +189,12 @@ export async function createHarvestApiScraper({
                       })
                     : { comments: [] };
 
-                  const query = Object.fromEntries(queryParams);
-                  for (const key of Object.keys(query)) {
-                    if (!query[key] || query[key] === 'undefined') {
-                      delete query[key];
-                    }
-                  }
-
                   await pushPostData({
                     type: 'post',
                     ...post,
                     reactions,
                     comments,
-                    query: query,
+                    query: queryParams,
                   });
                 }
               }
