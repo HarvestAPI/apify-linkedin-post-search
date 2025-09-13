@@ -70,6 +70,14 @@ export async function createHarvestApiScraper({
           console.warn(`Max scraped items reached: ${actorMaxPaidDatasetItems}`);
           return;
         }
+        for (const key of Object.keys(params) as Array<keyof typeof params>) {
+          if (!params[key] || params[key] === 'undefined') {
+            delete params[key];
+          }
+          if (Array.isArray(params[key]) && params[key].length === 0) {
+            delete params[key];
+          }
+        }
         const entityKey = JSON.stringify(params);
 
         console.info(`Fetching posts for ${entityKey}...`);
@@ -100,11 +108,6 @@ export async function createHarvestApiScraper({
             page: String(i),
             ...(paginationToken ? { paginationToken } : {}),
           };
-          for (const key of Object.keys(queryParams) as Array<keyof typeof queryParams>) {
-            if (!queryParams[key] || queryParams[key] === 'undefined') {
-              delete queryParams[key];
-            }
-          }
 
           const response: ApiListResponse<PostShort> = await fetch(
             `${process.env.HARVESTAPI_URL || 'https://api.harvest-api.com'}/linkedin/post-search?${new URLSearchParams(queryParams).toString()}`,
