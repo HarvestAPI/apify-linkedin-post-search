@@ -135,16 +135,14 @@ export async function createHarvestApiScraper({
                 break;
               }
 
-              if (params.postedLimit) {
-                const postPostedDate = post?.postedAt?.timestamp
-                  ? new Date(post?.postedAt?.timestamp)
-                  : null;
+              const postPostedDate = post?.postedAt?.timestamp
+                ? new Date(post?.postedAt?.timestamp)
+                : null;
 
-                if (maxDate && postPostedDate) {
-                  if (maxDate.getTime() > postPostedDate.getTime()) {
-                    maxDateReached = true;
-                    continue;
-                  }
+              if (maxDate && postPostedDate) {
+                if (maxDate.getTime() > postPostedDate.getTime()) {
+                  maxDateReached = true;
+                  continue;
                 }
               }
 
