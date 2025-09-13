@@ -1,8 +1,10 @@
+import { ApiListResponse, PostShort } from '@harvestapi/scraper';
 import { Actor } from 'apify';
-import { createConcurrentQueues } from './queue.js';
-import { scrapeReactionsForPost } from './reactions.js';
+import { subMonths } from 'date-fns';
 import { Input, ScraperState } from '../main.js';
 import { scrapeCommentsForPost } from './comments.js';
+import { createConcurrentQueues } from './queue.js';
+import { scrapeReactionsForPost } from './reactions.js';
 
 const { actorId, actorRunId, actorBuildId, userId, actorMaxPaidDatasetItems, memoryMbytes } =
   Actor.getEnv();
@@ -31,6 +33,21 @@ export async function createHarvestApiScraper({
   const scrapedPostsPerProfile: Record<string, Record<string, boolean>> = {};
   const client = Actor.newClient();
   const user = userId ? await client.user(userId).get() : null;
+
+  let maxDate: Date | null = null;
+  if (input.postedLimit === '24h') {
+    maxDate = new Date(Date.now() - 24 * 60 * 60 * 1000);
+  } else if (input.postedLimit === 'week') {
+    maxDate = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+  } else if (input.postedLimit === 'month') {
+    maxDate = subMonths(new Date(), 1);
+  } else if (input.postedLimit === '3months') {
+    maxDate = subMonths(new Date(), 3);
+  } else if (input.postedLimit === '6months') {
+    maxDate = subMonths(new Date(), 6);
+  } else if (input.postedLimit === 'year') {
+    maxDate = subMonths(new Date(), 12);
+  }
 
   return {
     scrapedPostsPerProfile,
@@ -62,7 +79,7 @@ export async function createHarvestApiScraper({
         const startPage = Number(params.page) || 1;
         const endPage = typeof maxPosts === 'number' ? 200 : startPage + (Number(scrapePages) || 1);
         let maxDateReached = false;
-        let paginationToken: string = '';
+        let paginationToken: string | null | undefined = null;
 
         for (let i = startPage; i < endPage; i++) {
           if (state.itemsLeft <= 0) {
@@ -81,10 +98,10 @@ export async function createHarvestApiScraper({
           const queryParams = new URLSearchParams({
             ...params,
             page: String(i),
-            paginationToken,
+            ...(paginationToken ? { paginationToken } : {}),
           });
 
-          const response = await fetch(
+          const response: ApiListResponse<PostShort> = await fetch(
             `${process.env.HARVESTAPI_URL || 'https://api.harvest-api.com'}/linkedin/post-search?${queryParams.toString()}`,
             {
               headers: {
@@ -119,15 +136,6 @@ export async function createHarvestApiScraper({
               }
 
               if (params.postedLimit) {
-                let maxDate: Date | null = null;
-                if (params.postedLimit === '24h') {
-                  maxDate = new Date(Date.now() - 24 * 60 * 60 * 1000);
-                } else if (params.postedLimit === 'week') {
-                  maxDate = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
-                } else if (params.postedLimit === 'month') {
-                  maxDate = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
-                }
-
                 const postPostedDate = post?.postedAt?.timestamp
                   ? new Date(post?.postedAt?.timestamp)
                   : null;
@@ -151,27 +159,32 @@ export async function createHarvestApiScraper({
                     `Scraped post #${processedProfilesCounter}_${postsCounter} id:${post.id} for ${entityKey}`,
                   );
 
-                  const { reactions } = await scrapeReactionsForPost({
-                    post,
-                    state,
-                    input,
-                    originalInput,
-                    concurrency: reactionsConcurrency,
-                  }).catch((error) => {
-                    console.error(`Error scraping reactions for post ${post.id}:`, error);
-                    return { reactions: [] };
-                  });
+                  const { reactions } =
+                    post?.engagement?.likes || post?.engagement?.reactions
+                      ? await scrapeReactionsForPost({
+                          post,
+                          state,
+                          input,
+                          originalInput,
+                          concurrency: reactionsConcurrency,
+                        }).catch((error) => {
+                          console.error(`Error scraping reactions for post ${post.id}:`, error);
+                          return { reactions: [] };
+                        })
+                      : { reactions: [] };
 
-                  const { comments } = await scrapeCommentsForPost({
-                    post,
-                    state,
-                    input,
-                    originalInput,
-                    concurrency: reactionsConcurrency,
-                  }).catch((error) => {
-                    console.error(`Error scraping comments for post ${post.id}:`, error);
-                    return { comments: [] };
-                  });
+                  const { comments } = !!post?.engagement?.comments
+                    ? await scrapeCommentsForPost({
+                        post,
+                        state,
+                        input,
+                        originalInput,
+                        concurrency: reactionsConcurrency,
+                      }).catch((error) => {
+                        console.error(`Error scraping comments for post ${post.id}:`, error);
+                        return { comments: [] };
+                      })
+                    : { comments: [] };
 
                   const query = Object.fromEntries(queryParams);
                   for (const key of Object.keys(query)) {
@@ -185,7 +198,6 @@ export async function createHarvestApiScraper({
                     ...post,
                     reactions,
                     comments,
-                    input: originalInput,
                     query: query,
                   });
                 }

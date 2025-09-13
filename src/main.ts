@@ -15,7 +15,7 @@ await Actor.init();
 
 export interface Input {
   searchQueries: string[];
-  postedLimit: '24h' | 'week' | 'month';
+  postedLimit?: 'any' | '24h' | 'week' | 'month' | '3months' | '6months' | 'year';
   sortBy: 'date' | 'relevance';
   page?: string;
   scrapePages?: string;
@@ -37,7 +37,7 @@ export interface Input {
   maxReactions?: number;
   scrapeComments?: boolean;
   maxComments?: number;
-  commentsPostedLimit?: 'any' | '24h' | 'week' | 'month';
+  commentsPostedLimit?: 'any' | '24h' | 'week' | 'month' | '3months' | '6months' | 'year';
 }
 // Structure of input is defined in input_schema.json
 const input = await Actor.getInput<Input>();
@@ -132,7 +132,6 @@ const scraper = await createHarvestApiScraper({
 const searchPromises = input.searchQueries.map((search, index) => {
   return scraper.addJob({
     params: {
-      postedLimit: input.postedLimit,
       sortBy: input.sortBy,
       page: input.page || '1',
       search,
@@ -167,8 +166,7 @@ if (!input.searchQueries?.length) {
       return scraper.addJob({
         params: {
           ...profile,
-          postedLimit: input.postedLimit,
-          sortBy: input.postedLimit ? 'date' : input.sortBy,
+          sortBy: input.sortBy,
           page: input.page || '1',
         },
         index: index,

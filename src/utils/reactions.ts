@@ -10,7 +10,6 @@ export async function scrapeReactionsForPost({
   state,
   input,
   concurrency,
-  originalInput,
 }: {
   input: Input;
   post: { id: string; linkedinUrl: string };
@@ -67,7 +66,6 @@ export async function scrapeReactionsForPost({
       await Actor.pushData({
         type: 'reaction',
         ...item,
-        input: originalInput,
         query,
       });
     },

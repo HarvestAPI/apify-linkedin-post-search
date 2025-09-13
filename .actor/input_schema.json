@@ -22,7 +22,7 @@
       "type": "string",
       "description": "Fetch posts no older than X time. Options: '24h', 'week', 'month'.",
       "editor": "select",
-      "enum": ["any", "24h", "week", "month"]
+      "enum": ["any", "24h", "week", "month", "3months", "6months", "year"]
     },
     "sortBy": {
       "title": "Sort by",
@@ -73,7 +73,7 @@
       "type": "string",
       "description": "Fetch comments no older than X time. Options: '24h', 'week', 'month'.",
       "editor": "select",
-      "enum": ["any", "24h", "week", "month"]
+      "enum": ["any", "24h", "week", "month", "3months", "6months", "year"]
     },
     "maxComments": {
       "title": "Maximum number of comments to scrape per post",
