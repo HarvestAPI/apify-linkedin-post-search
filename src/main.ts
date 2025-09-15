@@ -135,9 +135,11 @@ const searchPromises = input.searchQueries.map((search, index) => {
       sortBy: input.sortBy,
       page: input.page || '1',
       search,
+      postedLimit: search ? (input.postedLimit as any) : undefined,
       ...query,
     },
     scrapePages: Number(input.scrapePages),
+
     maxPosts: input.maxPosts === 0 || input.maxPosts === '0' ? 0 : Number(input.maxPosts) || null,
     index,
     total: input.searchQueries.length,
