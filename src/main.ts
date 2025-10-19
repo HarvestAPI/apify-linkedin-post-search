@@ -17,7 +17,7 @@ export interface Input {
   searchQueries: string[];
   postedLimit?: 'any' | '24h' | 'week' | 'month' | '3months' | '6months' | 'year';
   sortBy: 'date' | 'relevance';
-  page?: string;
+  startPage?: string;
   scrapePages?: string;
   maxPosts: number | string;
   profileUrls?: string[];
@@ -133,7 +133,7 @@ const searchPromises = input.searchQueries.map((search, index) => {
   return scraper.addJob({
     params: {
       sortBy: input.sortBy,
-      page: input.page || '1',
+      page: input.startPage || '1',
       search,
       postedLimit: search ? (input.postedLimit as any) : undefined,
       ...query,
@@ -169,7 +169,7 @@ if (!input.searchQueries?.length) {
         params: {
           ...profile,
           sortBy: input.sortBy,
-          page: input.page || '1',
+          page: input.startPage || '1',
         },
         index: index,
         ...commonArgs,

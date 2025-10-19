@@ -48,6 +48,23 @@
       "maxItems": 20
     },
 
+    "startPage": {
+      "title": "Start Page",
+      "type": "integer",
+      "description": "The page number to start scraping from. ",
+      "default": 1,
+      "minimum": 1,
+      "maximum": 100,
+      "sectionCaption": "Pagination options"
+    },
+    "scrapePages": {
+      "title": "Number of pages to scrape",
+      "type": "integer",
+      "description": "The number of search pages to scrape. Each page contains 100 posts",
+      "minimum": 0,
+      "maximum": 100
+    },
+
     "scrapeReactions": {
       "sectionCaption": "Reactions",
       "title": "Scrape Reactions",
