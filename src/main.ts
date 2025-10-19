@@ -115,18 +115,26 @@ const { actorMaxPaidDatasetItems } = Actor.getEnv();
 
 export type ScraperState = {
   itemsLeft: number;
-  datasetLastPushPromise?: Promise<any>;
+  processedQueries: Record<string, boolean>;
+  scrapedPageNumberPerQuery: Record<string, number>;
 };
-const state: ScraperState = {
+const state: ScraperState = (await Actor.getValue('crawling-state')) || {
   itemsLeft: actorMaxPaidDatasetItems || 1000000,
+  processedQueries: {},
+  scrapedPageNumberPerQuery: {},
 };
 
+Actor.on('migrating', async () => {
+  await Actor.setValue('crawling-state', state);
+  await Actor.reboot();
+});
+
 const scraper = await createHarvestApiScraper({
-  concurrency: 6,
+  concurrency: 10,
   state,
   input,
   originalInput,
-  reactionsConcurrency: 2,
+  reactionsConcurrency: 5,
 });
 
 const searchPromises = input.searchQueries.map((search, index) => {
@@ -182,8 +190,6 @@ if (!input.searchQueries?.length) {
 await Promise.all([...searchPromises]).catch((error) => {
   console.error(`Error scraping profiles:`, error);
 });
-
-await state.datasetLastPushPromise;
 
 // Gracefully exit the Actor process. It's recommended to quit all Actors with an exit().
 await Actor.exit();

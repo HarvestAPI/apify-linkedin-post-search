@@ -79,6 +79,10 @@ export async function createHarvestApiScraper({
           }
         }
         const entityKey = JSON.stringify(params);
+        if (state.processedQueries[entityKey]) {
+          console.info(`Skipping already processed query: ${entityKey}`);
+          return;
+        }
 
         console.info(`Fetching posts for ${entityKey}...`);
         // const timestamp = new Date();
@@ -88,8 +92,9 @@ export async function createHarvestApiScraper({
         const endPage = typeof maxPosts === 'number' ? 200 : startPage + (Number(scrapePages) || 1);
         let maxDateReached = false;
         let paginationToken: string | null | undefined = null;
+        const previouslyScrapedPageNumber = state.scrapedPageNumberPerQuery[entityKey] || null;
 
-        for (let i = startPage; i < endPage; i++) {
+        for (let i = previouslyScrapedPageNumber || startPage; i < endPage; i++) {
           if (state.itemsLeft <= 0) {
             console.warn(`Max scraped items reached: ${actorMaxPaidDatasetItems}`);
             break;
@@ -202,6 +207,8 @@ export async function createHarvestApiScraper({
                 }
               }
             }
+            state.scrapedPageNumberPerQuery[entityKey] = i;
+            await Actor.setValue('crawling-state', state);
           } else {
             const error = typeof response.error === 'object' ? response.error : response;
             if (typeof error === 'object') {
@@ -220,6 +227,8 @@ export async function createHarvestApiScraper({
 
         // const elapsed = new Date().getTime() - timestamp.getTime();
         processedProfilesCounter++;
+        state.processedQueries[entityKey] = true;
+        await Actor.setValue('crawling-state', state);
 
         console.info(
           `Scraped posts for ${entityKey}. Posts found ${postsCounter}. Progress: ${processedProfilesCounter}/${total}`,
