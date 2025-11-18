@@ -44,7 +44,6 @@
       "type": "array",
       "editor": "stringList",
       "description": "Scrape posts of profile-authors who assigned to LinkedIn Company Names of these companies. Example: `Google` will fetch posts of Google employees or ex-employees in some cases.",
-      "prefill": ["google", "amazon"],
       "maxItems": 20
     },
 
