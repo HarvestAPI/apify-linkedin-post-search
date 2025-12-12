@@ -9,7 +9,7 @@ import { scrapeReactionsForPost } from './reactions.js';
 const { actorId, actorRunId, actorBuildId, userId, actorMaxPaidDatasetItems, memoryMbytes } =
   Actor.getEnv();
 
-const pushPostData = createConcurrentQueues(190, async (item: Record<string, any>) => {
+const pushPostData = createConcurrentQueues(100, async (item: Record<string, any>) => {
   await Actor.pushData({
     ...item,
   });
@@ -139,6 +139,8 @@ export async function createHarvestApiScraper({
           paginationToken = response?.pagination?.paginationToken;
 
           if (response.elements && response.status < 400) {
+            const postsPushPromises: Promise<void>[] = [];
+
             for (const post of response.elements) {
               if (state.itemsLeft <= 0) {
                 console.warn(`Max scraped items reached: ${actorMaxPaidDatasetItems}`);
@@ -154,7 +156,9 @@ export async function createHarvestApiScraper({
 
               if (maxDate && postPostedDate) {
                 if (maxDate.getTime() > postPostedDate.getTime()) {
-                  maxDateReached = true;
+                  if (input.sortBy === 'date') {
+                    maxDateReached = true;
+                  }
                   continue;
                 }
               }
@@ -197,16 +201,20 @@ export async function createHarvestApiScraper({
                       })
                     : { comments: [] };
 
-                  await pushPostData({
-                    type: 'post',
-                    ...post,
-                    reactions,
-                    comments,
-                    query: queryParams,
-                  });
+                  postsPushPromises.push(
+                    pushPostData({
+                      type: 'post',
+                      ...post,
+                      reactions,
+                      comments,
+                      query: queryParams,
+                    }),
+                  );
                 }
               }
             }
+            await Promise.all(postsPushPromises);
+
             state.scrapedPageNumberPerQuery[entityKey] = i;
             await Actor.setValue('crawling-state', state);
           } else {
