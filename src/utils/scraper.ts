@@ -33,6 +33,7 @@ export async function createHarvestApiScraper({
   const scrapedPostsPerProfile: Record<string, Record<string, boolean>> = {};
   const client = Actor.newClient();
   const user = userId ? await client.user(userId).get() : null;
+  const sessionId = crypto.randomUUID();
 
   let maxDate: Date | null = null;
   if (input.postedLimit === '24h') {
@@ -89,7 +90,8 @@ export async function createHarvestApiScraper({
         let postsCounter = 0;
 
         const startPage = Number(params.page) || 1;
-        const endPage = typeof maxPosts === 'number' ? 200 : startPage + (Number(scrapePages) || 1);
+        const endPage =
+          typeof maxPosts === 'number' ? 100 : startPage + (Number(scrapePages) || 100);
         let maxDateReached = false;
         let paginationToken: string | null | undefined = null;
         const previouslyScrapedPageNumber = state.scrapedPageNumberPerQuery[entityKey] || null;
@@ -100,9 +102,11 @@ export async function createHarvestApiScraper({
             break;
           }
           if (maxPosts && postsCounter >= maxPosts) {
+            console.info(`Reached maxPosts limit: ${maxPosts}`);
             break;
           }
           if (maxDateReached) {
+            console.info(`Max date reached for ${entityKey}, stopping further requests.`);
             break;
           }
 
@@ -112,6 +116,7 @@ export async function createHarvestApiScraper({
             ...params,
             page: String(i),
             ...(paginationToken ? { paginationToken } : {}),
+            sessionId,
           };
 
           const response: ApiListResponse<PostShort> = await fetch(
@@ -136,6 +141,9 @@ export async function createHarvestApiScraper({
               return {};
             });
 
+          console.info(
+            `Fetched page ${i} for ${entityKey}, received ${response.elements?.length || 0} posts. Total posts for this query: ${response.pagination?.totalResultCount || response.pagination?.totalElements}`,
+          );
           paginationToken = response?.pagination?.paginationToken;
 
           if (response.elements && response.status < 400) {
@@ -147,6 +155,7 @@ export async function createHarvestApiScraper({
                 break;
               }
               if (maxPosts && postsCounter >= maxPosts) {
+                console.info(`Reached maxPosts limit: ${maxPosts}`);
                 break;
               }
 
@@ -156,6 +165,9 @@ export async function createHarvestApiScraper({
 
               if (maxDate && postPostedDate) {
                 if (maxDate.getTime() > postPostedDate.getTime()) {
+                  console.info(
+                    `Post id:${post.id} date ${postPostedDate.toISOString()} is older than maxDate ${maxDate.toISOString()}`,
+                  );
                   if (input.sortBy === 'date') {
                     maxDateReached = true;
                   }
@@ -163,55 +175,61 @@ export async function createHarvestApiScraper({
                 }
               }
 
-              if (post.id) {
-                scrapedPostsPerProfile[entityKey] = scrapedPostsPerProfile[entityKey] || {};
-                if (!scrapedPostsPerProfile[entityKey][post.id]) {
-                  scrapedPostsPerProfile[entityKey][post.id] = true;
-                  postsCounter++;
-                  postsOnPageCounter++;
-                  state.itemsLeft -= 1;
-                  console.info(
-                    `Scraped post #${processedProfilesCounter}_${postsCounter} id:${post.id} for ${entityKey}`,
-                  );
-
-                  const { reactions } =
-                    post?.engagement?.likes || post?.engagement?.reactions
-                      ? await scrapeReactionsForPost({
-                          post,
-                          state,
-                          input,
-                          originalInput,
-                          concurrency: reactionsConcurrency,
-                        }).catch((error) => {
-                          console.error(`Error scraping reactions for post ${post.id}:`, error);
-                          return { reactions: [] };
-                        })
-                      : { reactions: [] };
-
-                  const { comments } = !!post?.engagement?.comments
-                    ? await scrapeCommentsForPost({
-                        post,
-                        state,
-                        input,
-                        originalInput,
-                        concurrency: reactionsConcurrency,
-                      }).catch((error) => {
-                        console.error(`Error scraping comments for post ${post.id}:`, error);
-                        return { comments: [] };
-                      })
-                    : { comments: [] };
-
-                  postsPushPromises.push(
-                    pushPostData({
-                      type: 'post',
-                      ...post,
-                      reactions,
-                      comments,
-                      query: queryParams,
-                    }),
-                  );
-                }
+              if (!post.id) {
+                console.warn(`Post without ID found for ${entityKey}, skipping.`);
+                continue;
               }
+
+              scrapedPostsPerProfile[entityKey] = scrapedPostsPerProfile[entityKey] || {};
+              if (scrapedPostsPerProfile[entityKey][post.id]) {
+                console.info(`Post id:${post.id} already scraped for ${entityKey}, skipping.`);
+                continue;
+              }
+
+              scrapedPostsPerProfile[entityKey][post.id] = true;
+              postsCounter++;
+              postsOnPageCounter++;
+              state.itemsLeft -= 1;
+              console.info(
+                `Scraped post #${processedProfilesCounter}_${postsCounter} id:${post.id} for ${entityKey}`,
+              );
+
+              const { reactions } =
+                post?.engagement?.likes || post?.engagement?.reactions
+                  ? await scrapeReactionsForPost({
+                      post,
+                      state,
+                      input,
+                      originalInput,
+                      concurrency: reactionsConcurrency,
+                    }).catch((error) => {
+                      console.error(`Error scraping reactions for post ${post.id}:`, error);
+                      return { reactions: [] };
+                    })
+                  : { reactions: [] };
+
+              const { comments } = !!post?.engagement?.comments
+                ? await scrapeCommentsForPost({
+                    post,
+                    state,
+                    input,
+                    originalInput,
+                    concurrency: reactionsConcurrency,
+                  }).catch((error) => {
+                    console.error(`Error scraping comments for post ${post.id}:`, error);
+                    return { comments: [] };
+                  })
+                : { comments: [] };
+
+              postsPushPromises.push(
+                pushPostData({
+                  type: 'post',
+                  ...post,
+                  reactions,
+                  comments,
+                  query: queryParams,
+                }),
+              );
             }
             await Promise.all(postsPushPromises);
 
@@ -229,6 +247,7 @@ export async function createHarvestApiScraper({
           }
 
           if (postsOnPageCounter === 0) {
+            console.info(`No posts found on page ${i}, stopping for ${entityKey}.`);
             break;
           }
         }
