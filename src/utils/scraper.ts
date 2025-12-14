@@ -1,19 +1,18 @@
-import { ApiListResponse, PostShort } from '@harvestapi/scraper';
+import {
+  ApiListResponse,
+  createConcurrentQueues,
+  createLinkedinScraper,
+  PostShort,
+} from '@harvestapi/scraper';
 import { Actor } from 'apify';
 import { subMonths } from 'date-fns';
 import { Input, ScraperState } from '../main.js';
 import { scrapeCommentsForPost } from './comments.js';
-import { createConcurrentQueues } from './queue.js';
 import { scrapeReactionsForPost } from './reactions.js';
+import { getPostPushData } from './getPostPushData.js';
 
 const { actorId, actorRunId, actorBuildId, userId, actorMaxPaidDatasetItems, memoryMbytes } =
   Actor.getEnv();
-
-const pushPostData = createConcurrentQueues(100, async (item: Record<string, any>) => {
-  await Actor.pushData({
-    ...item,
-  });
-});
 
 export async function createHarvestApiScraper({
   concurrency,
@@ -34,6 +33,24 @@ export async function createHarvestApiScraper({
   const client = Actor.newClient();
   const user = userId ? await client.user(userId).get() : null;
   const sessionId = crypto.randomUUID();
+  const cm = Actor.getChargingManager();
+  const pricingInfo = cm.getPricingInfo();
+
+  const scraper = createLinkedinScraper({
+    apiKey: process.env.HARVESTAPI_TOKEN!,
+    baseUrl: process.env.HARVESTAPI_URL || 'https://api.harvest-api.com',
+    addHeaders: {
+      'x-apify-userid': userId!,
+      'x-apify-actor-id': actorId!,
+      'x-apify-actor-run-id': actorRunId!,
+      'x-apify-actor-build-id': actorBuildId!,
+      'x-apify-memory-mbytes': String(memoryMbytes),
+      'x-apify-username': user?.username || '',
+      'x-apify-user-is-paying': (user as Record<string, any> | null)?.isPaying,
+      'x-apify-max-total-charge-usd': String(pricingInfo.maxTotalChargeUsd),
+      'x-apify-actor-max-paid-dataset-items': String(actorMaxPaidDatasetItems) || '0',
+    },
+  });
 
   let maxDate: Date | null = null;
   if (input.postedLimit === '24h') {
@@ -49,6 +66,12 @@ export async function createHarvestApiScraper({
   } else if (input.postedLimit === 'year') {
     maxDate = subMonths(new Date(), 12);
   }
+
+  const pushPostData = getPostPushData({
+    scraper,
+    input,
+    pricingInfo,
+  });
 
   return {
     scrapedPostsPerProfile,
@@ -114,28 +137,13 @@ export async function createHarvestApiScraper({
 
           const queryParams = {
             ...params,
-            page: String(i),
+            page: i,
             ...(paginationToken ? { paginationToken } : {}),
             sessionId,
           };
 
-          const response: ApiListResponse<PostShort> = await fetch(
-            `${process.env.HARVESTAPI_URL || 'https://api.harvest-api.com'}/linkedin/post-search?${new URLSearchParams(queryParams).toString()}`,
-            {
-              headers: {
-                'X-API-Key': process.env.HARVESTAPI_TOKEN!,
-                'x-apify-userid': userId!,
-                'x-apify-actor-id': actorId!,
-                'x-apify-actor-run-id': actorRunId!,
-                'x-apify-actor-build-id': actorBuildId!,
-                'x-apify-memory-mbytes': String(memoryMbytes),
-                'x-apify-actor-max-paid-dataset-items': String(actorMaxPaidDatasetItems) || '0',
-                'x-apify-username': user?.username || '',
-                'x-apify-user-is-paying': (user as Record<string, any> | null)?.isPaying,
-              },
-            },
-          )
-            .then((response) => response.json())
+          const response: Partial<ApiListResponse<PostShort>> = await scraper
+            .searchPosts(queryParams)
             .catch((error) => {
               console.error(`Error fetching posts:`, error);
               return {};
@@ -146,7 +154,7 @@ export async function createHarvestApiScraper({
           );
           paginationToken = response?.pagination?.paginationToken;
 
-          if (response.elements && response.status < 400) {
+          if (response.elements && response.status && response.status < 400) {
             const postsPushPromises: Promise<void>[] = [];
 
             for (const post of response.elements) {
@@ -223,11 +231,13 @@ export async function createHarvestApiScraper({
 
               postsPushPromises.push(
                 pushPostData({
-                  type: 'post',
-                  ...post,
-                  reactions,
-                  comments,
-                  query: queryParams,
+                  item: {
+                    type: 'post',
+                    ...post,
+                    reactions,
+                    comments,
+                    query: queryParams,
+                  },
                 }),
               );
             }

@@ -38,6 +38,7 @@ export interface Input {
   scrapeComments?: boolean;
   maxComments?: number;
   commentsPostedLimit?: 'any' | '24h' | 'week' | 'month' | '3months' | '6months' | 'year';
+  profileScraperMode?: 'short' | 'main' | 'full' | 'full_email_search';
 }
 // Structure of input is defined in input_schema.json
 const input = await Actor.getInput<Input>();
