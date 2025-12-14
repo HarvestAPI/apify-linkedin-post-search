@@ -8,7 +8,6 @@ Our powerful tool helps you search posts by text and filter by LinkedIn profiles
 - Low pricing: $2 per 1k posts.
 - Fast response times deliver data in seconds 🚀
 - No caching, fresh data.
-- Concurrency: the actor scrapes 6 search queries at a time.
 
 ## How It Works
 
