@@ -32,7 +32,6 @@ export async function createHarvestApiScraper({
   const scrapedPostsPerProfile: Record<string, Record<string, boolean>> = {};
   const client = Actor.newClient();
   const user = userId ? await client.user(userId).get() : null;
-  const sessionId = crypto.randomUUID();
   const cm = Actor.getChargingManager();
   const pricingInfo = cm.getPricingInfo();
 
@@ -90,6 +89,8 @@ export async function createHarvestApiScraper({
         index: number;
         total: number;
       }) => {
+        const sessionId = crypto.randomUUID();
+
         if (state.itemsLeft <= 0) {
           console.warn(`Max scraped items reached: ${actorMaxPaidDatasetItems}`);
           return;
