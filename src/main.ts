@@ -152,6 +152,7 @@ const searchPromises = input.searchQueries.map((search, index) => {
     maxPosts: input.maxPosts === 0 || input.maxPosts === '0' ? 0 : Number(input.maxPosts) || null,
     index,
     total: input.searchQueries.length,
+    useSessionId: true,
   });
 });
 
@@ -182,6 +183,7 @@ if (!input.searchQueries?.length) {
         },
         index: index,
         ...commonArgs,
+        useSessionId: false,
       });
     }),
   ];

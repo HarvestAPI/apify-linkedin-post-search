@@ -10,6 +10,7 @@ import { Input, ScraperState } from '../main.js';
 import { scrapeCommentsForPost } from './comments.js';
 import { scrapeReactionsForPost } from './reactions.js';
 import { getPostPushData } from './getPostPushData.js';
+import { pick } from './misc.js';
 
 const { actorId, actorRunId, actorBuildId, userId, actorMaxPaidDatasetItems, memoryMbytes } =
   Actor.getEnv();
@@ -82,12 +83,14 @@ export async function createHarvestApiScraper({
         scrapePages,
         maxPosts,
         total,
+        useSessionId,
       }: {
         params: Record<string, string | string[]>;
         scrapePages: number;
         maxPosts: number | null;
         index: number;
         total: number;
+        useSessionId: boolean;
       }) => {
         const sessionId = crypto.randomUUID();
 
@@ -140,7 +143,7 @@ export async function createHarvestApiScraper({
             ...params,
             page: i,
             ...(paginationToken ? { paginationToken } : {}),
-            sessionId,
+            sessionId: useSessionId ? sessionId : undefined,
           };
 
           const response: Partial<ApiListResponse<PostShort>> = await scraper
@@ -237,7 +240,7 @@ export async function createHarvestApiScraper({
                     ...post,
                     reactions,
                     comments,
-                    query: queryParams,
+                    query: pick(queryParams, ['sessionId']).rest,
                   },
                 }),
               );
