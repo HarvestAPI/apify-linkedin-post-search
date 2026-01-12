@@ -15,7 +15,7 @@ await Actor.init();
 
 export interface Input {
   searchQueries: string[];
-  postedLimit?: 'any' | '24h' | 'week' | 'month' | '3months' | '6months' | 'year';
+  postedLimit?: 'any' | '1h' | '24h' | 'week' | 'month' | '3months' | '6months' | 'year';
   sortBy: 'date' | 'relevance';
   startPage?: string;
   scrapePages?: string;
@@ -37,7 +37,7 @@ export interface Input {
   maxReactions?: number;
   scrapeComments?: boolean;
   maxComments?: number;
-  commentsPostedLimit?: 'any' | '24h' | 'week' | 'month' | '3months' | '6months' | 'year';
+  commentsPostedLimit?: 'any' | '1h' | '24h' | 'week' | 'month' | '3months' | '6months' | 'year';
   profileScraperMode?: 'short' | 'main' | 'full' | 'full_email_search';
 }
 // Structure of input is defined in input_schema.json

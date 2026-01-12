@@ -53,7 +53,10 @@ export async function createHarvestApiScraper({
   });
 
   let maxDate: Date | null = null;
-  if (input.postedLimit === '24h') {
+
+  if (input.postedLimit === '1h') {
+    maxDate = new Date(Date.now() - 60 * 60 * 1000);
+  } else if (input.postedLimit === '24h') {
     maxDate = new Date(Date.now() - 24 * 60 * 60 * 1000);
   } else if (input.postedLimit === 'week') {
     maxDate = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
@@ -132,10 +135,10 @@ export async function createHarvestApiScraper({
             console.info(`Reached maxPosts limit: ${maxPosts}`);
             break;
           }
-          if (maxDateReached) {
-            console.info(`Max date reached for ${entityKey}, stopping further requests.`);
-            break;
-          }
+          // if (maxDateReached) {
+          //   console.info(`Max date reached for ${entityKey}, stopping further requests.`);
+          //   break;
+          // }
 
           let postsOnPageCounter = 0;
 
@@ -177,9 +180,9 @@ export async function createHarvestApiScraper({
 
               if (maxDate && postPostedDate) {
                 if (maxDate.getTime() > postPostedDate.getTime()) {
-                  console.info(
-                    `Post id:${post.id} date ${postPostedDate.toISOString()} is older than maxDate ${maxDate.toISOString()}`,
-                  );
+                  // console.info(
+                  //   `Post id:${post.id} date ${postPostedDate.toISOString()} is older than maxDate ${maxDate.toISOString()}`,
+                  // );
                   if (input.sortBy === 'date') {
                     maxDateReached = true;
                   }

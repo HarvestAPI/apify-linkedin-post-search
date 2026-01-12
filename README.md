@@ -30,7 +30,7 @@ Additional content:
 
 Other params (optionally):
 
-- `postedLimit` - Fetch posts no older than X time. Options: '24h', 'week', 'month'.
+- `postedLimit` - Fetch posts no older than X time. Options: '1h', '24h', 'week', 'month', '3months', '6months', 'year'.
 - `sortBy` - Sort by 'relevance' (of the search query) or 'date' (newest first).
 - `maxPosts` - Maximum number of posts to scrape per each search query. This overrides `scrapePages` pagination. If you set this to 0, it will scrape all posts.
 - `startPage` - The page number to start scraping from. Default is 1.
