@@ -86,7 +86,7 @@ export async function createHarvestApiScraper({
         scrapePages,
         maxPosts,
         total,
-        // useSessionId,
+        useSessionId,
       }: {
         params: Record<string, string | string[]>;
         scrapePages: number;
@@ -95,7 +95,7 @@ export async function createHarvestApiScraper({
         total: number;
         useSessionId: boolean;
       }) => {
-        // const sessionId = crypto.randomUUID();
+        const sessionId = crypto.randomUUID();
 
         if (state.itemsLeft <= 0) {
           console.warn(`Max scraped items reached: ${actorMaxPaidDatasetItems}`);
@@ -150,7 +150,7 @@ export async function createHarvestApiScraper({
             ...params,
             page: i,
             ...(paginationToken ? { paginationToken } : {}),
-            // sessionId: useSessionId ? sessionId : undefined,
+            sessionId: useSessionId ? sessionId : undefined,
           };
 
           const response: Partial<ApiListResponse<PostShort>> = await scraper
