@@ -86,7 +86,7 @@ export async function createHarvestApiScraper({
         scrapePages,
         maxPosts,
         total,
-        useSessionId,
+        // useSessionId,
       }: {
         params: Record<string, string | string[]>;
         scrapePages: number;
@@ -122,7 +122,7 @@ export async function createHarvestApiScraper({
         const startPage = Number(params.page) || 1;
         const endPage =
           typeof maxPosts === 'number' ? 100 : startPage + (Number(scrapePages) || 100);
-        let maxDateReached = false;
+        // let maxDateReached = false;
         let paginationToken: string | null | undefined = null;
         const previouslyScrapedPageNumber = state.scrapedPageNumberPerQuery[entityKey] || null;
 
@@ -188,7 +188,7 @@ export async function createHarvestApiScraper({
                   //   `Post id:${post.id} date ${postPostedDate.toISOString()} is older than maxDate ${maxDate.toISOString()}`,
                   // );
                   if (input.sortBy === 'date') {
-                    maxDateReached = true;
+                    // maxDateReached = true;
                   }
                   continue;
                 }
