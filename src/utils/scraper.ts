@@ -178,8 +178,10 @@ export async function createHarvestApiScraper({
                 break;
               }
 
-              const postPostedDate = post?.postedAt?.timestamp
-                ? new Date(post?.postedAt?.timestamp)
+              const postPostedDateTimestamp = ((post as any)?.repostedAt || post?.postedAt)
+                ?.timestamp;
+              const postPostedDate = postPostedDateTimestamp
+                ? new Date(postPostedDateTimestamp)
                 : null;
 
               if (maxDate && postPostedDate) {
