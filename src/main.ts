@@ -44,6 +44,7 @@ export interface Input {
 const input = await Actor.getInput<Input>();
 if (!input) throw new Error('Input is missing!');
 input.searchQueries = (input.searchQueries || []).filter((q) => q && !!q.trim());
+if (!input.profileScraperMode) input.profileScraperMode = 'short';
 
 const originalInput = JSON.parse(JSON.stringify(input)); // deep copy to avoid mutation
 

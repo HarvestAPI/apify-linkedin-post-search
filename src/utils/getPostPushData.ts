@@ -28,7 +28,8 @@ export function getPostPushData({
           const profile = await scraper
             .getProfile({
               url: item.author?.linkedinUrl,
-              main: true,
+              main: input.profileScraperMode === 'main',
+              findEmail: input.profileScraperMode === 'full_email_search',
             })
             .catch((err) => {
               console.warn(
@@ -39,7 +40,14 @@ export function getPostPushData({
             });
           if (profile?.element?.id) {
             if (pricingInfo.isPayPerEvent) {
-              const profileChargeResult = await Actor.charge({ eventName: 'main-profile' });
+              let eventName = 'main-profile';
+              if (input.profileScraperMode === 'full') {
+                eventName = 'full-profile';
+              }
+              if (input.profileScraperMode === 'full_email_search') {
+                eventName = 'full-profile-with-email';
+              }
+              const profileChargeResult = await Actor.charge({ eventName });
               if (profileChargeResult.eventChargeLimitReached) {
                 await Actor.exit({
                   statusMessage: 'max charge reached',
